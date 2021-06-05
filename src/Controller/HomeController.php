@@ -13,9 +13,14 @@ class HomeController extends AbstractController
      */
     public function index(): Response
     {
-        return $this->render('home/index.html.twig', [
+        /*return $this->render('home/index.html.twig', [
             'controller_name' => 'HomeController',
-        ]);
+        ]);*/
+        $user = $this->getUser();
+        if($user){
+        return $this->redirectToRoute('post_index');}
+        else 
+        return $this->redirectToRoute('app_login');
     }
    
 }

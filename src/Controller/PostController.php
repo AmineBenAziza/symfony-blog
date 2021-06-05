@@ -20,10 +20,12 @@ class PostController extends AbstractController
      * @Route("/", name="post_index", methods={"GET"})
      */
     public function index(PostRepository $postRepository): Response
-    {
+    {$user = $this->getUser();
+        if($user){
         return $this->render('post/index.html.twig', [
             'posts' => $postRepository->findAll(),
-        ]);
+        ]);}else 
+        return $this->redirectToRoute('app_login');
     }
 
     /**
@@ -31,6 +33,7 @@ class PostController extends AbstractController
      */
     public function new(Request $request, UploadableManager $uploadableManager): Response
     {
+        if($this->getUser()){
         $post = new Post();
         $form = $this->createForm(PostType::class, $post);
         $form->handleRequest($request);
@@ -51,7 +54,9 @@ class PostController extends AbstractController
         return $this->render('post/new.html.twig', [
             'post' => $post,
             'form' => $form->createView(),
-        ]);
+        ]);}
+        else
+        return $this->redirectToRoute('app_login');
     }
 
     /**
@@ -59,9 +64,13 @@ class PostController extends AbstractController
      */
     public function show(Post $post): Response
     {
+        if($this->getUser()){
         return $this->render('post/show.html.twig', [
             'post' => $post,
-        ]);
+        ]);}
+        else
+        return $this->redirectToRoute('app_login');
+
     }
 
     /**
@@ -69,6 +78,7 @@ class PostController extends AbstractController
      */
     public function edit(Request $request, Post $post, UploadableManager $uploadableManager): Response
     {
+        if($this->getUser()){
         $form = $this->createForm(PostType::class, $post);
         $form->handleRequest($request);
 
@@ -86,7 +96,9 @@ class PostController extends AbstractController
         return $this->render('post/edit.html.twig', [
             'post' => $post,
             'form' => $form->createView(),
-        ]);
+        ]);}
+        else
+        return $this->redirectToRoute('app_login');
     }
 
     /**
@@ -94,6 +106,7 @@ class PostController extends AbstractController
      */
     public function delete(Request $request, Post $post): Response
     {
+        if($this->getUser()){
         if ($this->isCsrfTokenValid('delete'.$post->getId(), $request->request->get('_token'))) {
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->remove($post);
@@ -101,5 +114,8 @@ class PostController extends AbstractController
         }
 
         return $this->redirectToRoute('post_index');
+    }
+    else
+    return $this->redirectToRoute('app_login');
     }
 }
